@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta Nodo · Tech & Growth</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@5.0.16/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@5.0.16/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/plus-jakarta-sans@7.0.0/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/plus-jakarta-sans@7.0.0/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/plus-jakarta-sans@7.0.0/600.css">
+<style>
+:root{
+  --bg: #06020c; 
+  --bg2: #0f0518;
+  --p900: #140524;
+  --p800: #1f083d;
+  --p700: #2d0b5e;
+  --p600: #4c1d95;
+  --p400: #8b5cf6;
+  --p300: #a78bfa;
+  --p200: #c4b5fd;
+  --p100: #ede9fe;
+  --acc: #00f0ff; /* Cyan tech (neon) */
+  --acc2: #a78bfa; /* Soft purple */
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --card-bg: rgba(20, 5, 36, 0.5);
+  --card-border: rgba(139, 92, 246, 0.25);
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Plus Jakarta Sans', 'Helvetica Neue', sans-serif;
+  --mono: 'Courier New', monospace;
+  --r: 16px;
+  --sh: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; overflow-x: hidden; }
+
+/* ── MODO EDICIÓN ── */
+[contenteditable="true"] { outline: none; transition: all 0.2s; border-radius: 4px; display: inline-block; min-width: 20px;}
+body.edit-mode [contenteditable="true"] {
+  border-bottom: 1px dashed var(--acc);
+  background: rgba(0, 240, 255, 0.05);
+  cursor: text;
+  padding: 0 4px;
+}
+body.edit-mode [contenteditable="true"]:focus {
+  background: rgba(0, 240, 255, 0.15);
+  border-bottom: 1px solid var(--acc);
+}
+#author-tools {
+  position: fixed; top: 80px; right: 20px; z-index: 999;
+  background: var(--p800); border: 1px solid var(--acc);
+  padding: 12px; border-radius: 12px; display: flex; gap: 10px; flex-direction: column;
+  box-shadow: 0 0 25px rgba(0,240,255,0.2); backdrop-filter: blur(10px);
+}
+#author-tools button {
+  background: var(--p600); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px;
+  border-radius: 8px; cursor: pointer; font-family: var(--sans); font-size: 12px; font-weight: 600;
+  transition: all 0.2s;
+}
+#author-tools button:hover { background: var(--p400); }
+#author-tools button.export { background: var(--acc); color: #000; box-shadow: 0 0 15px rgba(0,240,255,0.4); border:none;}
+
+/* ── HEADER ── */
+header { position: sticky; top: 0; z-index: 100; background: rgba(6, 2, 12, 0.85); backdrop-filter: blur(16px); padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 62px; border-bottom: 1px solid var(--card-border); box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+.logo { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.logo-mark { font-family: var(--mono); font-size: 17px; font-weight: 900; color: #fff; letter-spacing: 4px; text-shadow: 0 0 15px var(--p400); line-height: 1; }
+.logo-sub { font-size: 7px; letter-spacing: 4px; color: var(--acc); text-transform: uppercase; line-height: 1; margin-top: 2px; font-weight: 700; }
+.logo-divider { width: 1px; height: 28px; background: var(--card-border); }
+.logo-client { font-family: var(--serif); font-size: 16px; color: var(--p200); letter-spacing: .02em; font-style: italic; }
+nav { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+nav::-webkit-scrollbar { display: none; }
+nav button { background: transparent; border: none; color: var(--muted); font-family: var(--sans); font-size: 12px; font-weight: 600; padding: 7px 14px; cursor: pointer; border-radius: 8px; white-space: nowrap; transition: all .2s; }
+nav button:hover { color: #fff; background: rgba(255,255,255,0.05); }
+nav button.on { background: rgba(124,58,237,0.2); color: var(--acc); border: 1px solid var(--card-border); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+
+/* ── HERO ── */
+.hero { padding: 5rem 1.5rem 4rem; position: relative; overflow: hidden; border-bottom: 1px solid var(--card-border); }
+.hero::before { content:''; position:absolute; inset:0; background: radial-gradient(circle at 50% 0%, var(--p800) 0%, transparent 65%); pointer-events: none; }
+.hero-grid { position: absolute; inset: 0; pointer-events: none; opacity: 0.25; background-image: linear-gradient(var(--p600) 1px, transparent 1px), linear-gradient(90deg, var(--p600) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg); transform-origin: top center; }
+.hero-glow { position: absolute; left: 50%; top: -150px; transform: translateX(-50%); width: 700px; height: 400px; background: var(--p600); filter: blur(120px); opacity: 0.4; pointer-events: none; }
+.hi { max-width: 820px; margin: 0 auto; position: relative; z-index: 1; text-align: center; }
+.htag { display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.3); color: var(--acc); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 6px 18px; border-radius: 30px; margin-bottom: 1.5rem; box-shadow: 0 0 20px rgba(0,240,255,0.15); backdrop-filter: blur(5px); }
+.hero h1 { font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 600; color: #fff; line-height: 1.1; margin-bottom: 1.2rem; }
+.hero h1 i { color: var(--acc); font-style: normal; text-shadow: 0 0 25px rgba(0,240,255,0.5); }
+.hero p { color: var(--muted); font-size: 16px; max-width: 650px; margin: 0 auto 3rem; }
+.stats { display: inline-flex; gap: 3rem; justify-content: center; flex-wrap: wrap; background: rgba(15,5,24,0.6); backdrop-filter: blur(12px); padding: 1.8rem 3rem; border-radius: 24px; border: 1px solid var(--card-border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.stats > div { text-align: center; }
+.sn { font-family: var(--mono); font-size: 2.5rem; font-weight: 700; color: #fff; display: block; line-height: 1; text-shadow: 0 0 15px rgba(139,92,246,0.5); }
+.sl { font-size: 11px; color: var(--p300); text-transform: uppercase; letter-spacing: .1em; margin-top: 8px; display: block; font-weight: 600; }
+
+/* ── MAIN ── */
+main { padding: 4rem 1.5rem; max-width: 1000px; margin: 0 auto; }
+.sec { display: none; animation: fi .5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
+.sec.on { display: block; }
+@keyframes fi { to { opacity: 1; transform: translateY(0); } }
+.st { font-family: var(--serif); font-size: 2.5rem; font-weight: 600; color: #fff; margin-bottom: .5rem; }
+.ss { color: var(--muted); font-size: 15px; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--card-border); max-width: 750px; }
+
+/* ── GRIDS & CARDS ── */
+.g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+.g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+.card { background: var(--card-bg); backdrop-filter: blur(12px); border-radius: var(--r); padding: 2rem; box-shadow: var(--sh); border: 1px solid var(--card-border); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.card:hover { transform: translateY(-5px); border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 15px 45px rgba(0,0,0,0.6), inset 0 0 30px rgba(124,58,237,0.1); }
+.card h3 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 1rem; }
+.card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.ci { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(0,240,255,0.1)); border: 1px solid var(--card-border); }
+
+/* ── BULLETS & BADGES ── */
+ul.cl { list-style: none; margin-top: 1.2rem; display: flex; flex-direction: column; gap: 10px; }
+ul.cl li { font-size: 14px; color: var(--muted); display: flex; align-items: flex-start; gap: 12px; line-height: 1.5; }
+ul.cl li::before { content: '◈'; color: var(--acc); font-size: 11px; flex-shrink: 0; margin-top: 4px; text-shadow: 0 0 10px var(--acc); }
+
+.badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.05em; text-transform: uppercase; }
+.bp { background: rgba(124,58,237,0.2); color: var(--p200); border: 1px solid var(--p600); }
+.bd { background: rgba(0,240,255,0.1); color: var(--acc); border: 1px solid rgba(0,240,255,0.3); }
+.ba { background: rgba(255,215,0,0.1); color: #ffd700; border: 1px solid rgba(255,215,0,0.3); }
+.pill { font-size: 11px; padding: 5px 12px; border-radius: 20px; background: var(--p900); color: var(--p200); border: 1px solid var(--card-border); font-weight: 500; display: inline-block; margin: 3px; }
+
+/* ── KPI BARS ── */
+.kpi-item { margin-bottom: 1.25rem; }
+.kh { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.kl { font-size: 13px; font-weight: 600; color: #fff; }
+.kv { font-size: 12px; font-family: var(--mono); color: var(--acc); font-weight: 600; }
+.kt { background: rgba(255,255,255,0.05); border-radius: 20px; height: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+.kf { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--p600), var(--acc)); transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1); width: 0; box-shadow: 0 0 10px var(--acc); }
+
+/* ── TIMELINE ── */
+.tl { position: relative; padding-left: 2.5rem; margin-top: 2rem; }
+.tl::before { content: ''; position: absolute; left: 11px; top: 8px; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--acc), var(--p600), transparent); }
+.ti { position: relative; margin-bottom: 2rem; }
+.td { position: absolute; left: -2.5rem; top: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--bg); border: 2px solid var(--acc); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: var(--acc); box-shadow: 0 0 15px rgba(0,240,255,0.3); }
+.tc { background: var(--card-bg); border-radius: var(--r); padding: 1.5rem; border: 1px solid var(--card-border); }
+.tc .tt { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--acc); margin-bottom: .5rem; }
+.tc h4 { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: .5rem; }
+
+/* ── EQUIPO ── */
+.ei { background: rgba(0,0,0,0.2); border-radius: 9px; padding: 1rem; border: 1px solid var(--card-border); }
+.ei h5 { font-size: 13.5px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.ei p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.tn { font-family: var(--serif); font-size: 1.6rem; font-weight: 600; color: #fff; }
+.tr { font-size: 14px; color: var(--acc); font-weight: 500; }
+.tco { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 2px; text-transform: uppercase; }
+.er { display: grid; grid-template-columns: repeat(auto-fit, minmax(195px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.av { width: 64px; height: 64px; border-radius: 50%; background: var(--p800); border: 2px solid var(--acc); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 16px; font-weight: 900; color: var(--acc); flex-shrink: 0; box-shadow: 0 0 15px rgba(0,240,255,0.2); }
+
+/* ── DARK BLOCKS (.ph) ── */
+.ph { background: rgba(20,5,36,0.8); border: 1px solid var(--card-border); border-radius: var(--r); padding: 1.8rem; color: #fff; }
+.ph h4 { font-size: 15px; font-weight: 600; color: var(--acc); margin-bottom: 1rem; }
+.ps { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.ps-item { flex: 1; min-width: 140px; border-left: 2px solid var(--p600); padding-left: 1rem; }
+.ps-item .m { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--p300); font-weight: 700; }
+.ps-item p { font-size: 13.5px; color: rgba(255,255,255,.7); margin-top: .4rem; }
+
+/* ── AI HIGHLIGHT ── */
+.ai-hl { background: linear-gradient(135deg, rgba(20,9,36,0.9), rgba(45,11,94,0.5)); border: 1px solid var(--p600); border-radius: var(--r); padding: 2.5rem; color: #fff; margin-bottom: 2.5rem; position: relative; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.ai-hl::after { content: ''; position: absolute; right: -50px; top: -50px; width: 250px; height: 250px; border-radius: 50%; background: radial-gradient(circle, rgba(0,240,255,0.15) 0%, transparent 70%); pointer-events: none; }
+.ai-hl h3 { font-family: var(--serif); font-size: 2rem; font-weight: 600; color: var(--acc); margin-bottom: 1rem; text-shadow: 0 0 20px rgba(0,240,255,0.3); }
+
+/* ── INVESTMENT ── */
+.ph2 { background: linear-gradient(to right, var(--p800), var(--p900)); border: 1px solid var(--p600); border-radius: var(--r); padding: 2.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem; position: relative; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.6); }
+.ph2::before { content:''; position:absolute; inset:0; background: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="%23a78bfa" fill-opacity="0.1"/></svg>'); opacity: 0.5; pointer-events:none; }
+.pm { font-family: var(--mono); font-size: 4rem; font-weight: 700; color: #fff; line-height: 1; text-shadow: 0 0 25px rgba(139,92,246,0.6); margin-top: 0.5rem;}
+.pp { font-size: 14px; color: var(--acc); font-weight: 600; margin-top: .8rem; text-transform: uppercase; letter-spacing: .08em; }
+.pi ul { list-style: none; margin-top: .5rem; }
+.pi ul li { font-size: 15px; color: var(--text); display: flex; align-items: flex-start; gap: 12px; margin-bottom: .8rem; }
+.pi ul li::before { content: '✔'; color: var(--acc); font-weight: 700; flex-shrink: 0; text-shadow: 0 0 10px var(--acc); }
+
+/* ── ORACLE WIDGET ── */
+#oracle-widget { position: fixed; bottom: 30px; right: 30px; z-index: 1000; font-family: var(--sans); }
+#oracle-fab { background: linear-gradient(135deg, var(--p600), var(--acc)); color: #fff; border: none; border-radius: 30px; padding: 14px 24px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 30px rgba(0,240,255,0.3); display: flex; align-items: center; gap: 10px; transition: all 0.3s; }
+#oracle-fab:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,240,255,0.4); }
+#oracle-chat { display: none; position: absolute; bottom: 70px; right: 0; width: 360px; background: rgba(10,4,16,0.95); backdrop-filter: blur(20px); border: 1px solid var(--acc); border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(0,240,255,0.2); overflow: hidden; flex-direction: column; }
+#oracle-chat.show { display: flex; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.oracle-header { background: rgba(31,8,61,0.8); padding: 18px; font-weight: 700; color: #fff; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.05em; }
+.oracle-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 22px; transition: color 0.2s; }
+.oracle-close:hover { color: #fff; }
+.oracle-body { padding: 18px; height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.msg { max-width: 85%; padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.5; }
+.msg.ai { background: rgba(124,58,237,0.2); color: #fff; border-top-left-radius: 4px; align-self: flex-start; border: 1px solid rgba(124,58,237,0.3); }
+.msg.user { background: rgba(0,240,255,0.15); color: #fff; border-top-right-radius: 4px; align-self: flex-end; border: 1px solid rgba(0,240,255,0.3); }
+.oracle-input { padding: 15px; border-top: 1px solid var(--card-border); display: flex; gap: 10px; background: rgba(0,0,0,0.3); }
+.oracle-input input { flex: 1; background: var(--bg); border: 1px solid var(--card-border); padding: 12px; border-radius: 10px; color: #fff; outline: none; font-family: var(--sans); }
+.oracle-input input:focus { border-color: var(--acc); box-shadow: 0 0 10px rgba(0,240,255,0.2); }
+.oracle-input button { background: var(--acc); color: #000; border: none; padding: 0 18px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 18px; transition: transform 0.2s; }
+.oracle-input button:hover { transform: scale(1.05); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--p600); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--acc); }
+
+@media(max-width: 620px){
+  header { padding: 0 1rem; }
+  .logo-client, .logo-divider { display: none; }
+  .hero h1 { font-size: 2.2rem; }
+  .pm { font-size: 3rem; }
+  #oracle-chat { width: calc(100vw - 40px); right: -10px; }
+  .stats { gap: 1.5rem; padding: 1.5rem; }
+}
+</style>
+</head>
+<body class="edit-mode">
+
+<!-- HERRAMIENTAS DE AUTOR (No visibles para el cliente final) -->
+<div id="author-tools">
+  <div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;text-align:center;letter-spacing:0.1em">Modo Creador</div>
+  <button onclick="document.body.classList.toggle('edit-mode')">👁️ Activar/Desactivar Edición</button>
+  <button class="export" onclick="exportarPropuesta()">⬇️ Exportar Propuesta Final</button>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div>
+      <div class="logo-mark">NODO</div>
+      <div class="logo-sub">TECH & GROWTH</div>
+    </div>
+    <div class="logo-divider"></div>
+    <div class="logo-client" contenteditable="true" spellcheck="false">[[Nombre del Cliente]]</div>
+  </div>
+  <nav>
+    <button class="on" onclick="go('inicio',this)">Inicio</button>
+    <button onclick="go('alcance',this)">Alcance</button>
+    <button onclick="go('ia',this)">Tech & IA</button>
+    <button onclick="go('kpis',this)">Métricas</button>
+    <button onclick="go('cronograma',this)">Cronograma</button>
+    <button onclick="go('equipo',this)">Equipo</button>
+    <button onclick="go('inversion',this)">Inversión</button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hi">
+    <div class="htag">◈ Propuesta Comercial Interactiva</div>
+    <h1><span contenteditable="true" spellcheck="false">[[Nombre del Proyecto]]</span><br><i><span contenteditable="true" spellcheck="false">[[Solución Principal]]</span></i></h1>
+    <p contenteditable="true" spellcheck="false">[[Descripción ejecutiva de 2 líneas sobre lo que Nodo va a construir y resolver para este cliente. Enfocado en tecnología y resultados escalables.]]</p>
+    <div class="stats">
+      <div><span class="sn" data-target="45" contenteditable="true">45</span><span class="sl">Días Sprint</span></div>
+      <div><span class="sn" data-target="8" contenteditable="true">8</span><span class="sl">Entregables</span></div>
+      <div><span class="sn" data-target="3" contenteditable="true">3</span><span class="sl">Fases Core</span></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- INICIO -->
+<div id="inicio" class="sec on">
+  <p class="st" contenteditable="true">El futuro de tu operación</p>
+  <p class="ss" contenteditable="true">Digitalizar no es solo tener una página web; es construir un activo digital que trabaje 24/7 de manera automatizada y predecible. Esto es lo que construiremos para ti.</p>
+  <div class="g2">
+    <div class="card">
+      <div class="ci">🎯</div>
+      <h3 contenteditable="true">Arquitectura del Proyecto</h3>
+      <ul class="cl" contenteditable="true">
+        <li>Desarrollo de plataforma web escalable</li>
+        <li>Integración de IA para automatización</li>
+        <li>Diseño UI/UX inmersivo</li>
+        <li>Optimización de embudos de conversión</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ci">⚡</div>
+      <h3 contenteditable="true">Tech Stack</h3>
+      <ul class="cl" contenteditable="true">
+        <li>Frontend reactivo y de alta velocidad</li>
+        <li>Animaciones cinéticas con GSAP</li>
+        <li>Arquitectura Serverless moderna</li>
+        <li>Bases de datos optimizadas</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ALCANCE -->
+<div id="alcance" class="sec">
+  <p class="st" contenteditable="true" spellcheck="false">Paquete completo de servicios</p>
+  <p class="ss" contenteditable="true" spellcheck="false">Sin módulos sueltos, sin costos ocultos. Todo lo que tu proyecto necesita, coordinado por un solo equipo experto en tecnología.</p>
+  <div class="g2" style="margin-bottom:1.5rem">
+    <div class="card" style="border-top:3px solid var(--p400)">
+      <span class="badge bd" style="margin-bottom:.8rem" contenteditable="true" spellcheck="false">Tech & Growth</span>
+      <h3 contenteditable="true" spellcheck="false">Desarrollo Core</h3>
+      <ul class="cl" contenteditable="true" spellcheck="false">
+        <li>Desarrollo de ecosistema digital</li>
+        <li>Integración de bases de datos</li>
+        <li>Arquitectura y modelado</li>
+        <li>Implementación de seguridad</li>
+      </ul>
+    </div>
+    <div class="card" style="border-top:3px solid var(--acc)">
+      <span class="badge bp" style="margin-bottom:.8rem" contenteditable="true" spellcheck="false">Diseño & UI</span>
+      <h3 contenteditable="true" spellcheck="false">Experiencia de Usuario</h3>
+      <ul class="cl" contenteditable="true" spellcheck="false">
+        <li>Diseño de interfaces premium</li>
+        <li>Animaciones inmersivas (GSAP)</li>
+        <li>Sistema de diseño escalable</li>
+        <li>Adaptabilidad móvil 100%</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="border-top:3px solid var(--p300); background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(0,240,255,0.05))">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem">
+      <div>
+        <span class="badge ba" style="margin-bottom:.5rem" contenteditable="true" spellcheck="false">Incluido en el paquete</span>
+        <h3 contenteditable="true" spellcheck="false">Integraciones Especiales</h3>
+      </div>
+      <span style="font-family:var(--serif);font-size:1.6rem;font-weight:600;color:var(--acc)" contenteditable="true" spellcheck="false">Setup Completo</span>
+    </div>
+    <div class="g3">
+      <div><p style="font-size:13px;font-weight:600;color:#fff;margin-bottom:.25rem" contenteditable="true" spellcheck="false">Dominio + SSL</p><p style="font-size:13px;color:var(--muted)" contenteditable="true" spellcheck="false">Configuración de servidor y encriptación segura.</p></div>
+      <div><p style="font-size:13px;font-weight:600;color:#fff;margin-bottom:.25rem" contenteditable="true" spellcheck="false">Analítica Web</p><p style="font-size:13px;color:var(--muted)" contenteditable="true" spellcheck="false">Dashboards para monitoreo de tráfico en tiempo real.</p></div>
+      <div><p style="font-size:13px;font-weight:600;color:#fff;margin-bottom:.25rem" contenteditable="true" spellcheck="false">API Connections</p><p style="font-size:13px;color:var(--muted)" contenteditable="true" spellcheck="false">Conexión con CRM y herramientas externas.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- IA & TECH -->
+<div id="ia" class="sec">
+  <p class="st">Ecosistema Inteligente</p>
+  <p class="ss">No implementamos plantillas, construimos sistemas. La IA es el núcleo de nuestro enfoque para optimizar recursos y multiplicar resultados.</p>
+  <div class="ai-hl">
+    <h3 contenteditable="true">Oráculo Integrado</h3>
+    <p contenteditable="true">Tu cliente tendrá asistencia 24/7 mediante agentes de IA entrenados específicamente con tu data comercial, garantizando respuestas precisas y cierres de venta automáticos sin intervención manual.</p>
+  </div>
+  <div class="g3">
+    <div class="card">
+      <div style="font-size:26px;margin-bottom:1rem;text-shadow:0 0 15px var(--acc)">🤖</div>
+      <h3 contenteditable="true">Agentes Contextuales</h3>
+      <p contenteditable="true">IA que entiende tu negocio y guía a los usuarios hasta la conversión.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:26px;margin-bottom:1rem;text-shadow:0 0 15px var(--acc)">⚡</div>
+      <h3 contenteditable="true">Carga Ultrarrápida</h3>
+      <p contenteditable="true">Optimización extrema de assets para retener al 100% de los usuarios.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:26px;margin-bottom:1rem;text-shadow:0 0 15px var(--acc)">📊</div>
+      <h3 contenteditable="true">Data Predictiva</h3>
+      <p contenteditable="true">Análisis de comportamiento en tiempo real para mejorar conversiones.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MÉTRICAS / KPIs -->
+<div id="kpis" class="sec">
+  <p class="st" contenteditable="true" spellcheck="false">Métricas e indicadores clave</p>
+  <p class="ss" contenteditable="true" spellcheck="false">Resultados medibles y predecibles. Estructuramos KPIs técnicos para garantizar el éxito de la operación.</p>
+  <div class="g2">
+    <div class="card">
+      <h3 style="margin-bottom:1rem" contenteditable="true" spellcheck="false">Rendimiento Técnico Proyectado</h3>
+      <div class="kpi-item"><div class="kh"><span class="kl" contenteditable="true" spellcheck="false">Performance (Lighthouse)</span><span class="kv" contenteditable="true" spellcheck="false">95+</span></div><div class="kt"><div class="kf" data-w="95"></div></div></div>
+      <div class="kpi-item"><div class="kh"><span class="kl" contenteditable="true" spellcheck="false">Accesibilidad</span><span class="kv" contenteditable="true" spellcheck="false">100%</span></div><div class="kt"><div class="kf" data-w="100"></div></div></div>
+      <div class="kpi-item"><div class="kh"><span class="kl" contenteditable="true" spellcheck="false">SEO Técnico</span><span class="kv" contenteditable="true" spellcheck="false">98%</span></div><div class="kt"><div class="kf" data-w="98"></div></div></div>
+      <div class="kpi-item"><div class="kh"><span class="kl" contenteditable="true" spellcheck="false">Uptime Garantizado</span><span class="kv" contenteditable="true" spellcheck="false">99.9%</span></div><div class="kt"><div class="kf" data-w="99"></div></div></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:1.5rem">
+        <h3 contenteditable="true" spellcheck="false">Velocidad de Carga Estimada</h3>
+        <p style="font-family:var(--serif);font-size:2.5rem;font-weight:600;color:var(--acc);margin:.5rem 0" contenteditable="true" spellcheck="false">< 0.8s</p>
+        <p style="font-size:14px;color:var(--muted)" contenteditable="true" spellcheck="false">Tiempo de primera visualización de contenido (FCP)</p>
+      </div>
+      <div class="card">
+        <h3 contenteditable="true" spellcheck="false">Objetivos Estratégicos</h3>
+        <ul class="cl" contenteditable="true" spellcheck="false">
+          <li>Reducir la tasa de rebote en un 40%</li>
+          <li>Aumentar el tiempo de sesión promedio</li>
+          <li>Duplicar la tasa de conversión</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CRONOGRAMA -->
+<div id="cronograma" class="sec">
+  <p class="st" contenteditable="true" spellcheck="false">Cronograma del proyecto</p>
+  <p class="ss" contenteditable="true" spellcheck="false">Cada fase tiene un propósito claro y entregables definidos. Metodología ágil para asegurar velocidad y precisión.</p>
+  <div class="tl">
+    <div class="ti">
+      <div class="td">F0</div>
+      <div class="tc">
+        <p class="tt" contenteditable="true" spellcheck="false">Semana 1 · Setup</p>
+        <h4 contenteditable="true" spellcheck="false">Kickoff y Arquitectura</h4>
+        <p contenteditable="true" spellcheck="false">Levantamiento de requerimientos técnicos, configuración de repositorios y diseño de arquitectura base de datos.</p>
+      </div>
+    </div>
+    <div class="ti">
+      <div class="td">F1</div>
+      <div class="tc">
+        <p class="tt" contenteditable="true" spellcheck="false">Semana 2-3</p>
+        <h4 contenteditable="true" spellcheck="false">Desarrollo Frontend & Backend</h4>
+        <p contenteditable="true" spellcheck="false">Construcción de interfaces, conexión de APIs y desarrollo de lógica de negocio y animaciones inmersivas.</p>
+      </div>
+    </div>
+    <div class="ti">
+      <div class="td">F2</div>
+      <div class="tc">
+        <p class="tt" contenteditable="true" spellcheck="false">Semana 4</p>
+        <h4 contenteditable="true" spellcheck="false">Integración IA y Pruebas</h4>
+        <p contenteditable="true" spellcheck="false">Entrenamiento del oráculo, QA técnico, pruebas de carga y optimización final de assets.</p>
+      </div>
+    </div>
+    <div class="ti">
+      <div class="td" style="background:var(--acc);border-color:var(--bg);color:#000;text-shadow:none;font-size:12px">🚀</div>
+      <div class="tc" style="background:rgba(0,240,255,0.05);border-left:3px solid var(--acc)">
+        <p class="tt" contenteditable="true" spellcheck="false">Semana 5</p>
+        <h4 contenteditable="true" spellcheck="false">Despliegue y Entrega</h4>
+        <p contenteditable="true" spellcheck="false">Paso a producción, configuración de dominios, monitoreo post-lanzamiento y entrega de documentación.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ph" style="margin-top:2rem">
+    <h4 contenteditable="true" spellcheck="false">Estructura de Trabajo</h4>
+    <div class="ps">
+      <div class="ps-item"><span class="m" contenteditable="true" spellcheck="false">Agile Sprints</span><p contenteditable="true" spellcheck="false">Revisiones semanales para asegurar alineación de requerimientos.</p></div>
+      <div class="ps-item"><span class="m" contenteditable="true" spellcheck="false">Comunicación Directa</span><p contenteditable="true" spellcheck="false">Sin intermediarios, comunicación transparente y directa.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- EQUIPO -->
+<div id="equipo" class="sec">
+  <p class="st" contenteditable="true" spellcheck="false">El equipo detrás de tu proyecto</p>
+  <p class="ss" contenteditable="true" spellcheck="false">Ingenieros, diseñadores y estrategas. Un escuadrón técnico listo para escalar tu operación.</p>
+  <div class="card" style="margin-bottom:1.5rem; background:rgba(124,58,237,0.1)">
+    <h3 contenteditable="true" spellcheck="false">Nodo Tech & Growth · Engineering</h3>
+    <p style="font-size:14px;color:var(--muted);margin-top:.3rem" contenteditable="true" spellcheck="false">Especialistas en arquitecturas modernas y alto rendimiento web.</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.5rem">
+      <div class="av" contenteditable="true" spellcheck="false">DV</div>
+      <div>
+        <p class="tn" contenteditable="true" spellcheck="false">[[Nombre del Tech Lead]]</p>
+        <p class="tr" contenteditable="true" spellcheck="false">Tech Lead & Full Stack Developer</p>
+        <p class="tco">Nodo Tech & Growth</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem" contenteditable="true" spellcheck="false">
+      <span class="badge bp">React / Next.js</span>
+      <span class="badge bd">Node & IA</span>
+      <span class="badge ba">UI/UX Animation</span>
+    </div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:1.5rem" contenteditable="true" spellcheck="false">Lidero la visión técnica del proyecto asegurando que no solo se vea bien, sino que tenga el rendimiento de una plataforma de clase mundial.</p>
+    <p style="font-size:11.5px;font-weight:700;color:var(--p200);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">Herramientas y plataformas</p>
+    <div contenteditable="true" spellcheck="false">
+      <span class="pill">React / Vite</span><span class="pill">TailwindCSS</span>
+      <span class="pill">GSAP</span><span class="pill">Node.js</span>
+      <span class="pill">AWS / Vercel</span><span class="pill">OpenAI API</span>
+    </div>
+    <p style="font-size:11.5px;font-weight:700;color:var(--p200);text-transform:uppercase;letter-spacing:.05em;margin:1.5rem 0 .5rem">Experiencia relevante</p>
+    <div class="er">
+      <div class="ei"><h5 contenteditable="true" spellcheck="false">Proyectos E-commerce</h5><p contenteditable="true" spellcheck="false">Optimización de embudos y carga rápida para maximizar ventas.</p></div>
+      <div class="ei"><h5 contenteditable="true" spellcheck="false">Dashboards IA</h5><p contenteditable="true" spellcheck="false">Integración de paneles de control inteligentes para toma de decisiones.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- INVERSIÓN -->
+<div id="inversion" class="sec">
+  <p class="st">Inversión Tecnológica</p>
+  <p class="ss">Transparencia absoluta. Un presupuesto estructurado para garantizar calidad de nivel empresarial y entregas a tiempo.</p>
+  <div class="ph2">
+    <div>
+      <p style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:.5rem" contenteditable="true">Desarrollo Full-Stack</p>
+      <p class="pm">$<span contenteditable="true">0.000.000</span></p>
+      <p class="pp" contenteditable="true">COP · Inversión Única</p>
+    </div>
+    <div class="pi">
+      <ul contenteditable="true">
+        <li>Desarrollo de plataforma interactiva</li>
+        <li>Integración de agente de IA (Oráculo)</li>
+        <li>Diseño de interfaz UI/UX premium</li>
+        <li>Setup de servidores y dominios</li>
+        <li>Garantía de rendimiento técnico</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ORÁCULO WIDGET -->
+<div id="oracle-widget">
+  <button id="oracle-fab" onclick="toggleOracle()">
+    <span style="font-size:20px;text-shadow:0 0 10px #fff">🤖</span> Oráculo de la Propuesta
+  </button>
+  <div id="oracle-chat">
+    <div class="oracle-header">
+      <span><span style="color:var(--acc)">●</span> Oráculo IA Nodo</span>
+      <button class="oracle-close" onclick="toggleOracle()">×</button>
+    </div>
+    <div class="oracle-body" id="oracle-messages">
+      <div class="msg ai">Hola. Soy la inteligencia artificial de Nodo. Conozco el 100% de esta propuesta técnica. ¿Tienes alguna pregunta sobre los entregables, tiempos o inversión?</div>
+    </div>
+    <div class="oracle-input">
+      <input type="text" id="oracle-input-field" placeholder="Pregúntame algo..." onkeypress="if(event.key === 'Enter') sendOracleMessage()">
+      <button onclick="sendOracleMessage()">→</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Navegación de secciones
+function go(id, btn) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if(btn) btn.classList.add('on');
+  
+  if(id === 'kpis') {
+    setTimeout(runKPIs, 200);
+  }
+}
+
+// Animación de barras KPI
+function runKPIs() {
+  document.querySelectorAll('.kf').forEach(b => { 
+    b.style.width = b.dataset.w + '%'; 
+  });
+}
+
+// Animación de números en el Hero
+function runCounters() {
+  document.querySelectorAll('[data-target]').forEach(el => {
+    const t = +el.dataset.target;
+    if (isNaN(t)) return;
+    let c = 0, step = Math.max(t / 40, 1);
+    const tmr = setInterval(() => {
+      c = Math.min(c + step, t);
+      el.textContent = Math.round(c);
+      if (c >= t) clearInterval(tmr);
+    }, 30);
+  });
+}
+window.addEventListener('load', () => setTimeout(runCounters, 300));
+
+// Oráculo Chat Lógica (Para la propuesta pública)
+function toggleOracle() {
+  document.getElementById('oracle-chat').classList.toggle('show');
+}
+
+// Función asíncrona para interactuar con la IA
+async function sendOracleMessage() {
+  const input = document.getElementById('oracle-input-field');
+  const text = input.value.trim();
+  if(!text) return;
+  
+  const chat = document.getElementById('oracle-messages');
+  
+  // Agregar mensaje del usuario
+  chat.innerHTML += `<div class="msg user">${text}</div>`;
+  input.value = '';
+  chat.scrollTop = chat.scrollHeight;
+
+  // Animación de "escribiendo"
+  const typingId = 'typing-' + Date.now();
+  chat.innerHTML += `<div id="${typingId}" class="msg ai" style="opacity:0.7">El oráculo está analizando la propuesta...</div>`;
+  chat.scrollTop = chat.scrollHeight;
+
+  // ==========================================
+  // AQUÍ PUEDES CONECTAR TU API REAL (OpenAI, Anthropic, etc)
+  // Ejemplo: fetch('tu-api-url', { method: 'POST', body: JSON.stringify({prompt: text}) })
+  // ==========================================
+  
+  // Simulador de respuestas para la demostración
+  setTimeout(() => {
+    document.getElementById(typingId).remove();
+    
+    const aiResponses = [
+      "Toda nuestra arquitectura se despliega en infraestructura escalable (AWS/Vercel) para asegurar tiempos de respuesta en milisegundos.",
+      "El valor de la inversión cubre el despliegue inicial y la parametrización de la IA con la data de tu negocio.",
+      "Trabajamos por sprints semanales. Podrás ver avances reales y funcionales, no solo diseños en papel.",
+      "El oráculo que construiremos para tu marca podrá responder preguntas a tus clientes 24/7 y agendar citas o cerrar ventas automáticamente.",
+      "Los colores, tipografías y el 'feel' de la plataforma serán adaptados 100% al manual de marca de tu empresa, pero con un toque tecnológico premium."
+    ];
+    
+    const reply = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+    chat.innerHTML += `<div class="msg ai">${reply}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  }, 1500);
+}
+
+// Exportar HTML Limpio para el Cliente
+function exportarPropuesta() {
+  // Desactivar temporalmente el modo edición
+  const wasEditMode = document.body.classList.contains('edit-mode');
+  document.body.classList.remove('edit-mode');
+  
+  // Clonar el documento
+  const clone = document.documentElement.cloneNode(true);
+  
+  // Eliminar la caja de herramientas de creador
+  const tools = clone.querySelector('#author-tools');
+  if (tools) tools.remove();
+  
+  // Eliminar atributos de edición para que el cliente final no pueda editar
+  clone.querySelectorAll('[contenteditable]').forEach(el => {
+    el.removeAttribute('contenteditable');
+    el.removeAttribute('spellcheck');
+  });
+
+  // Crear archivo y descargar
+  const html = '<!DOCTYPE html>\\n' + clone.outerHTML;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Propuesta_Tech_Nodo.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  
+  // Restaurar modo edición si estaba activo
+  if(wasEditMode) {
+    document.body.classList.add('edit-mode');
+  }
+}
+</script>
+</body>
+</html>
